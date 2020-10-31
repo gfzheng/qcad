@@ -43,6 +43,9 @@ _CL_*
 *.tmp
 *.pdb
 *.ilk
+*.sln
+.vs
+*.vcxproj*
 
 # Output folders:
 debug
