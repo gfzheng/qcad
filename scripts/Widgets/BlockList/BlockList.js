@@ -40,6 +40,8 @@ function RBlockListQt(parent, addListener) {
 //        this.header().close();
 //    }
     this.iconSize = new QSize(32, 32);
+//    this.setWrapping(false);
+//    this.setViewMode(QListView::IconMode);
 //    this.indentation = 0;
 //    this.rootIsDecorated = false;
 
@@ -259,7 +261,7 @@ RBlockListQt.prototype.updateBlocks = function(documentInterface) {
         var blockName = block.getName();
 
         var item = this.createBlockItem(block);
-        this.addTopLevelItem(item);
+        this.addItem(item);
         if (blockName===selectedBlockName) {
             selectedItem = item;
         }
@@ -319,7 +321,8 @@ RBlockListQt.prototype.updateItemIcons = function(item, block) {
     var doc = this.di.getDocument();
     var currentBlockId = doc.getCurrentBlockId();
     //iconName = autoIconPath(BlockList.includeBasePath + "/Edit%1.svg".arg(Number(block.getId()===currentBlockId)));
-    item.setIcon(BlockList.iconEdit[Number(block.getId()===currentBlockId)]);
+    //item.setIcon(BlockList.iconEdit[Number(block.getId()===currentBlockId)]);
+    item.setIcon(BlockList.iconEdit[1]);
 };
 
 /**
@@ -561,6 +564,10 @@ BlockList.init = function(basePath) {
     var layout = formWidget.findChild("verticalLayout");
     var blockList = new RBlockListQt(layout);
     blockList.objectName = "BlockList";
+    blockList.setViewMode(1);
+    //blockList.setWrapping(false);
+    //blockList.setMovement(QListView::Static);
+    //blockList.setFlow(QListView::LeftToRight);
     layout.addWidget(blockList, 1, 0);
 
     RSettings.setValue("BlockList/AlternatingRowColor", new RColor(230, 235, 250), false);

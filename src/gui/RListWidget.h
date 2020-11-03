@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QListView>
 #include <QtDebug>
 
 /**
