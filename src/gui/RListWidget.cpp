@@ -43,6 +43,20 @@ RListWidget::RListWidget(QWidget* parent) :
 RListWidget::~RListWidget() {
 }
 
+/**
+ * \return The active item. Either the selected or current item.
+ * This is the item an action is applied for.
+ */
+
+QListWidgetItem* RListWidget::getActiveItem()
+{
+    QList<QListWidgetItem*> sel = selectedItems();
+    if (!sel.isEmpty()) {
+        return sel[0];
+    }
+    return currentItem();
+}
+
 void RListWidget::contextMenuEvent(QContextMenuEvent* e) {
     if (e != NULL) {
         QListWidgetItem* item = itemAt(e->pos());

@@ -23,64 +23,68 @@ include("scripts/WidgetFactory.js");
 /**
  * Block list widget class (QWidget).
  */
-function RBlockListQt(parent, addListener, showHeader) {
-    RTreeWidget.call(this, parent);
+function RBlockListQt(parent, addListener) {
+//    RTreeWidget.call(this, parent);
+    RListWidget.call(this, parent);
 
     if (isNull(addListener)) {
         addListener = true;
     }
-    if (isNull(showHeader)) {
-        showHeader = false;
-    }
+//    if (isNull(showHeader)) {
+//        showHeader = false;
+//    }
 
     this.di = undefined;
 
-    if (!showHeader) {
-        this.header().close();
-    }
-    this.iconSize = new QSize(16, 16);
-    this.indentation = 0;
-    this.rootIsDecorated = false;
+//    if (!showHeader) {
+//        this.header().close();
+//    }
+    this.iconSize = new QSize(32, 32);
+//    this.indentation = 0;
+//    this.rootIsDecorated = false;
 
-    this.setSelectableColumn(2);
+//    this.setSelectableColumn(2);
 
-    this.columnCount = 3;
 
-    this.header().stretchLastSection = false;
-    if (RSettings.isQt(5)) {
-        this.header().minimumSectionSize = 22;
-        this.header().setSectionResizeMode(BlockList.colName, QHeaderView.Stretch);
-        this.header().setSectionResizeMode(BlockList.colVisible, QHeaderView.Interactive);
-        this.header().setSectionResizeMode(BlockList.colEdit, QHeaderView.Interactive);
-    }
-    else {
-        this.header().setResizeMode(BlockList.colName, QHeaderView.Stretch);
-        this.header().setResizeMode(BlockList.colVisible, QHeaderView.Interactive);
-        this.header().setResizeMode(BlockList.colEdit, QHeaderView.Interactive);
-    }
+//    this.columnCount = 3;
 
-    this.setColumnWidth(BlockList.colVisible, 22);
-    this.setColumnWidth(BlockList.colEdit, 22);
+//    this.header().stretchLastSection = false;
+//    if (RSettings.isQt(5)) {
+//        this.header().minimumSectionSize = 22;
+//        this.header().setSectionResizeMode(BlockList.colName, QHeaderView.Stretch);
+//        this.header().setSectionResizeMode(BlockList.colVisible, QHeaderView.Interactive);
+//        this.header().setSectionResizeMode(BlockList.colEdit, QHeaderView.Interactive);
+//    }
+//    else {
+//        this.header().setResizeMode(BlockList.colName, QHeaderView.Stretch);
+//        this.header().setResizeMode(BlockList.colVisible, QHeaderView.Interactive);
+//        this.header().setResizeMode(BlockList.colEdit, QHeaderView.Interactive);
+//    }
+
+//    this.setColumnWidth(BlockList.colVisible, 22);
+//    this.setColumnWidth(BlockList.colEdit, 22);
 
     if (addListener) {
         var appWin = EAction.getMainWindow();
         var adapter = new RBlockListenerAdapter();
         appWin.addBlockListener(adapter);
         adapter.blocksUpdated.connect(this, "updateBlocks");
-        adapter.currentBlockSet.connect(this, "updateCurrentBlock");
-        adapter.blocksCleared.connect(this, "clearBlocks");
+//        adapter.currentBlockSet.connect(this, "updateCurrentBlock");
+//        adapter.blocksCleared.connect(this, "clearBlocks");
     }
 
-    this.itemDoubleClicked.connect(this, "editBlock");
-    this.itemColumnClicked.connect(this, "itemColumnClickedSlot");
-    this.itemSelectionChanged.connect(this, "blockActivated");
+//    this.itemDoubleClicked.connect(this, "editBlock");
+//    this.itemColumnClicked.connect(this, "itemColumnClickedSlot");
+//    this.itemSelectionChanged.connect(this, "blockActivated");
+
     this.basePath = includeBasePath;
 
     this.currentItem = undefined;
 
 }
 
-RBlockListQt.prototype = new RTreeWidget();
+//RBlockListQt.prototype = new RTreeWidget();
+RBlockListQt.prototype = new RListWidget();
 
 RBlockListQt.getWidget = function() {
     var appWin = EAction.getMainWindow();
@@ -154,7 +158,7 @@ RBlockListQt.complementContextMenu = function(menu, blockListWidget) {
 };
 
 RBlockListQt.prototype.filter = function(block) {
-    var hideInternal = RSettings.getBoolValue("BlockList/HideInternalBlocks", false);
+    var hideInternal = RSettings.getBoolValue("BlockList/HideInternalBlocks", true);
 
     if (hideInternal===true) {
         var blockNameLower = block.getName().toLowerCase();
@@ -184,7 +188,7 @@ RBlockListQt.prototype.updateCurrentBlock = function(documentInterface) {
         //var blockName = this.currentItem.data(BlockList.colName, Qt.UserRole);
         //var block = doc.queryBlock(blockName);
         //this.updateItemIcons(this.currentItem, block);
-        this.currentItem.setIcon(BlockList.colEdit, BlockList.iconEdit[0]);
+        this.currentItem.setIcon(BlockList.iconEdit[0]);
     }
 
     // find item of current block:
@@ -195,7 +199,7 @@ RBlockListQt.prototype.updateCurrentBlock = function(documentInterface) {
 
     // add pen icon to item:
     if (!isNull(this.currentItem)) {
-        this.currentItem.setIcon(BlockList.colEdit, BlockList.iconEdit[1]);
+        this.currentItem.setIcon(BlockList.iconEdit[1]);
     }
 };
 
@@ -211,7 +215,7 @@ RBlockListQt.prototype.updateBlocks = function(documentInterface) {
     var selectedBlockName = undefined;
     var selectedItems = this.selectedItems();
     if (selectedItems.length===1) {
-        selectedBlockName = selectedItems[0].data(BlockList.colName, Qt.UserRole);
+        selectedBlockName = selectedItems[0].data(Qt.UserRole);
     }
 
     this.clear();
@@ -290,7 +294,8 @@ RBlockListQt.getBlockTitle = function(block) {
 };
 
 RBlockListQt.prototype.createBlockItem = function(block) {
-    var item = new QTreeWidgetItem();
+//    var item = new QTreeWidgetItem();
+    var item = new QListWidgetItem();
     var name = block.getName();
 
     var flags = new Qt.ItemFlags(Qt.ItemIsSelectable|Qt.ItemIsEnabled);
@@ -298,9 +303,9 @@ RBlockListQt.prototype.createBlockItem = function(block) {
 
     var title = RBlockListQt.getBlockTitle(block);
 
-    item.setText(BlockList.colName, title);
+    item.setText(title);
 
-    item.setData(BlockList.colName, Qt.UserRole, name);
+    item.setData(Qt.UserRole, name);
 
     this.updateItemIcons(item, block);
 
@@ -309,12 +314,12 @@ RBlockListQt.prototype.createBlockItem = function(block) {
 
 RBlockListQt.prototype.updateItemIcons = function(item, block) {
     //var iconName = autoIconPath(BlockList.includeBasePath + "/Visible%1.svg".arg(Number(!block.isFrozen())));
-    item.setIcon(BlockList.colVisible, BlockList.iconVisible[Number(!block.isFrozen())]);
+    //item.setIcon(BlockList.iconVisible[Number(!block.isFrozen())]);
 
     var doc = this.di.getDocument();
     var currentBlockId = doc.getCurrentBlockId();
     //iconName = autoIconPath(BlockList.includeBasePath + "/Edit%1.svg".arg(Number(block.getId()===currentBlockId)));
-    item.setIcon(BlockList.colEdit, BlockList.iconEdit[Number(block.getId()===currentBlockId)]);
+    item.setIcon(BlockList.iconEdit[Number(block.getId()===currentBlockId)]);
 };
 
 /**
@@ -399,7 +404,7 @@ RBlockListQt.prototype.blockActivated = function() {
  * \return The block name for the given tree widget item.
  */
 RBlockListQt.prototype.getBlockName = function(item) {
-    return item.data(BlockList.colName, Qt.UserRole);
+    return item.data(Qt.UserRole);
 };
 
 /**
@@ -408,7 +413,7 @@ RBlockListQt.prototype.getBlockName = function(item) {
 RBlockListQt.getItem = function(widget, blockName) {
     for (var i=0; i<widget.topLevelItemCount; i++) {
         var item = widget.topLevelItem(i);
-        if (item.data(BlockList.colName, Qt.UserRole)===blockName) {
+        if (item.data(Qt.UserRole)===blockName) {
             return item;
         }
     }

@@ -46,6 +46,16 @@ public:
         iconOffset = o;
     }
 
+    //void setSelectableColumn(int c) {
+    //    selectableColumn = c;
+    //}
+
+    QModelIndex	getIndex(QListWidgetItem* item) {
+        return indexFromItem(item);
+    }
+
+    QListWidgetItem* getActiveItem();
+
 protected:
     virtual void contextMenuEvent(QContextMenuEvent* e);
     virtual void mousePressEvent(QMouseEvent* e);
@@ -58,6 +68,8 @@ signals:
 private:
     QListWidgetItem* itemPressed;
     int iconOffset;
+//    // selectable column or -1 for all:
+//    int selectableColumn;
 };
 
 Q_DECLARE_METATYPE(RListWidget*)
