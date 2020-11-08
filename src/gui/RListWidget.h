@@ -57,6 +57,17 @@ public:
 
     QListWidgetItem* getActiveItem();
 
+    // 设置为缩略图模式
+    Q_INVOKABLE void setBlockThumbMode() {
+        clearPropertyFlags();
+        setViewMode(QListView::IconMode);
+        setWrapping(false);
+        setMovement(QListView::Static);
+        setFlow(QListView::LeftToRight);
+        setIconSize(QSize(100, 100));
+        setSpacing(10);
+    }
+
 protected:
     virtual void contextMenuEvent(QContextMenuEvent* e);
     virtual void mousePressEvent(QMouseEvent* e);

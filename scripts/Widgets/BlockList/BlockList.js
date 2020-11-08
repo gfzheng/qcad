@@ -25,6 +25,7 @@ include("scripts/WidgetFactory.js");
  */
 function RBlockListQt(parent, addListener) {
 //    RTreeWidget.call(this, parent);
+    qDebug("RBlockListQt"+addListener);
     RListWidget.call(this, parent);
 
     if (isNull(addListener)) {
@@ -39,8 +40,12 @@ function RBlockListQt(parent, addListener) {
 //    if (!showHeader) {
 //        this.header().close();
 //    }
-    this.iconSize = new QSize(32, 32);
-//    this.setWrapping(false);
+    this.iconSize = new QSize(100, 100);
+    this.setBlockThumbMode();//缩略图模式
+    print("hello,world");//无用？
+    qDebug("hello");    //无用？
+
+//  this.setWrapping(false);
 //    this.setViewMode(QListView::IconMode);
 //    this.indentation = 0;
 //    this.rootIsDecorated = false;
@@ -71,18 +76,18 @@ function RBlockListQt(parent, addListener) {
         var adapter = new RBlockListenerAdapter();
         appWin.addBlockListener(adapter);
         adapter.blocksUpdated.connect(this, "updateBlocks");
-//        adapter.currentBlockSet.connect(this, "updateCurrentBlock");
-//        adapter.blocksCleared.connect(this, "clearBlocks");
+        adapter.currentBlockSet.connect(this, "updateCurrentBlock");
+        adapter.blocksCleared.connect(this, "clearBlocks");
     }
 
-//    this.itemDoubleClicked.connect(this, "editBlock");
-//    this.itemColumnClicked.connect(this, "itemColumnClickedSlot");
-//    this.itemSelectionChanged.connect(this, "blockActivated");
+    this.itemDoubleClicked.connect(this, "editBlock");
+    this.iconClicked.connect(this, "iconClickedSlot");
+    this.itemSelectionChanged.connect(this, "blockActivated");
 
     this.basePath = includeBasePath;
 
     this.currentItem = undefined;
-
+//    this.setBlockListMode();
 }
 
 //RBlockListQt.prototype = new RTreeWidget();
@@ -190,7 +195,7 @@ RBlockListQt.prototype.updateCurrentBlock = function(documentInterface) {
         //var blockName = this.currentItem.data(BlockList.colName, Qt.UserRole);
         //var block = doc.queryBlock(blockName);
         //this.updateItemIcons(this.currentItem, block);
-        this.currentItem.setIcon(BlockList.iconEdit[0]);
+        this.currentItem.setIcon(BlockList.iconEdit[1]);
     }
 
     // find item of current block:
@@ -306,7 +311,7 @@ RBlockListQt.prototype.createBlockItem = function(block) {
     var title = RBlockListQt.getBlockTitle(block);
 
     item.setText(title);
-
+    
     item.setData(Qt.UserRole, name);
 
     this.updateItemIcons(item, block);
@@ -336,7 +341,7 @@ RBlockListQt.prototype.clearBlocks = function() {
  * Called when the user clicks the icon beside the block name to hide
  * all block inserts of that block.
  */
-RBlockListQt.prototype.itemColumnClickedSlot = function(item, column) {
+RBlockListQt.prototype.iconClickedSlot = function(x, item) {
     if (isNull(this.di) || isNull(item)) {
         return;
     }
@@ -347,12 +352,12 @@ RBlockListQt.prototype.itemColumnClickedSlot = function(item, column) {
         return;
     }
 
-    if (column===BlockList.colVisible) {
+    if (x < this.iconSize.width() / 2) {
         block.setFrozen(!block.isFrozen());
         var op = new RModifyObjectOperation(block, false);
         this.di.applyOperation(op);
         //this.updateBlocks(this.di);
-    } else if (column===BlockList.colEdit) {
+    } else if (x < this.iconSize.width()) {
         this.setCurrentItem(item);
         this.editBlock();
         //this.updateBlocks(this.di);
@@ -468,8 +473,6 @@ RBlockListQt.prototype.editBlock = function() {
     this.blockActivated();
 };
 
-
-
 /**
  * \class BlockList
  * \brief Initializes the block list widget (RBlockListQt).
@@ -564,10 +567,7 @@ BlockList.init = function(basePath) {
     var layout = formWidget.findChild("verticalLayout");
     var blockList = new RBlockListQt(layout);
     blockList.objectName = "BlockList";
-    blockList.setViewMode(1);
-    //blockList.setWrapping(false);
-    //blockList.setMovement(QListView::Static);
-    //blockList.setFlow(QListView::LeftToRight);
+    
     layout.addWidget(blockList, 1, 0);
 
     RSettings.setValue("BlockList/AlternatingRowColor", new RColor(230, 235, 250), false);
@@ -597,7 +597,7 @@ BlockList.init = function(basePath) {
     dock.objectName = "BlockListDock";
     //dock.setProperty("Category", Widgets.getListContextMenuCategory());
     dock.setWidget(formWidget);
-    appWin.addDockWidget(Qt.RightDockWidgetArea, dock);
+    appWin.addDockWidget(Qt.TopDockWidgetArea, dock);
 
     dock.shown.connect(function() { action.setChecked(true); });
     dock.hidden.connect(function() { action.setChecked(false); });
